@@ -30,11 +30,30 @@ class UserController {
   }
 
   public async updateUser(ctx: Context) {
-    ctx.body = `UpdateUser controller with ID = ${ctx.params.id}`
+    // 将ctx.params.id转换成number类型
+    const id = Number(ctx.params.id)
+    const userInfo = ctx.request.body
+    const updatedUser = await UserService.updateUser(id, userInfo)
+
+    if (updatedUser) {
+      ctx.status = 200
+      ctx.body = updatedUser
+    } else {
+      ctx.status = 404
+    }
   }
 
   public async deleteUser(ctx: Context) {
-    ctx.body = `DeleteUser controller with ID = ${ctx.params.id}`
+    // 将ctx.params.id转换成number类型
+    const id = Number(ctx.params.id)
+    const deletedUser = await UserService.deleteUser(id)
+
+    if (deletedUser) {
+      ctx.status = 200
+      ctx.body = deletedUser
+    } else {
+      ctx.status = 404
+    }
   }
 }
 

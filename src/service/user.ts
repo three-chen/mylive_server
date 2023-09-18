@@ -1,23 +1,22 @@
-import UserMapper from '@/mapper/user';
+import UserMapper from '@/mapper/user'
+
+import { User } from '@/entity/User'
+import UserInfo from '@/service/data/UserInfo'
 
 export default class UserService {
-    public static async listUsers() {
+  public static async listUsers(): Promise<User[]> {
+    return await UserMapper.listUsers()
+  }
 
-        return UserMapper.listUsers();
-    }
+  public static async showUserDetail(id: number): Promise<User> {
+    return await UserMapper.showUserDetail(id)
+  }
 
-    public static async showUserDetail(id: number) {
+  public static async updateUser(id: number, userInfo: UserInfo) {
+    return await UserMapper.updateUser(id, userInfo)
+  }
 
-        return UserMapper.showUserDetail(id);
-    }
-
-    public static async updateUser() {
-
-        return UserMapper.updateUser();
-    }
-
-    public static async deleteUser() {
-
-        return UserMapper.deleteUser();
-    }
+  public static async deleteUser(id: number) {
+    return await UserMapper.deleteUser(id)
+  }
 }
