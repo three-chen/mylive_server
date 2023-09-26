@@ -3,8 +3,8 @@ import { Context } from 'koa'
 import UserService from '@/service/user'
 
 class UserController {
-  public async listUsers(ctx: Context) {
-    const users = await UserService.listUsers()
+  public async getUsers(ctx: Context) {
+    const users = await UserService.getUsers()
 
     if (users) {
       ctx.body = users
@@ -15,10 +15,10 @@ class UserController {
     }
   }
 
-  public async showUserDetail(ctx: Context) {
+  public async getUserById(ctx: Context) {
     // 将ctx.params.id转换成number类型
     const id = Number(ctx.params.id)
-    const user = await UserService.showUserDetail(id)
+    const user = await UserService.getUserById(id)
 
     if (user) {
       ctx.body = user
@@ -33,6 +33,7 @@ class UserController {
     // 将ctx.params.id转换成number类型
     const id = Number(ctx.params.id)
     const userInfo = ctx.request.body
+
     const updatedUser = await UserService.updateUser(id, userInfo)
 
     if (updatedUser) {
