@@ -15,7 +15,10 @@ class SignalServer extends EventEmitter {
 
   public init() {
     this.on('__joinRoom', this.joinRoom)
+    this.on('__ice_candidate', this.iceCandidate)
     this.on('__offer', this.retransOffer)
+    this.on('__answer', this.retransAnswer)
+    this.on('__remove_peer', this.removePeer)
   }
 
   public initSignalSocket(ws: WebSocket) {
@@ -38,12 +41,65 @@ class SignalServer extends EventEmitter {
       that.roomMap.set(roomAlias, room)
     }
     sws.socketId = userName
+    sws.roomAlias = roomAlias
     room.join(sws)
     room.newPeer(sws)
   }
 
-  public retransOffer(sws: SignalWebSocket, offer: RTCSessionDescriptionInit) {
+  /**
+   *
+   * @param sws 发送ice candidate一方的 socket
+   * @param socketId 发送给 socketId 一方
+   * @param iceCandidate 待发送的ice candidate
+   */
+  public iceCandidate(sws: SignalWebSocket, socketId: string, iceCandidate: RTCIceCandidateInit) {
     const that = this
+    const room = that.roomMap.get(sws.roomAlias)
+    if (room) {
+      room.retransIceCandidate(sws, socketId, iceCandidate)
+    }
+  }
+
+  /**
+   *
+   * @param sws 发送者的socket
+   * @param socketIds 发送给 socketId
+   * @param offer 待发送offer
+   */
+  public retransOffer(sws: SignalWebSocket, socketId: string, offer: RTCSessionDescriptionInit) {
+    const that = this
+    const room = that.roomMap.get(sws.roomAlias)
+    if (room) {
+      room.retransOffer(sws, socketId, offer)
+    }
+  }
+
+  /**
+   *
+   * @param sws 发送者的socket
+   * @param socketId 发送给 socketId
+   * @param answer 待发送answer
+   */
+  public retransAnswer(sws: SignalWebSocket, socketId: string, answer: RTCSessionDescriptionInit) {
+    const that = this
+    const room = that.roomMap.get(sws.roomAlias)
+    if (room) {
+      room.retransAnswer(sws, socketId, answer)
+    }
+  }
+
+  public removePeer(sws: SignalWebSocket) {
+    console.log('removePeer', sws.roomAlias, sws.socketId)
+
+    const that = this
+    const room = that.roomMap.get(sws.roomAlias)
+    if (room) {
+      room.removePeer(sws)
+    }
+    // 如果room为空，就删除该room
+    if (room && room.getSocketCount() === 0) {
+      that.roomMap.delete(sws.roomAlias)
+    }
   }
 }
 
