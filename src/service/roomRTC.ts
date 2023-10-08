@@ -93,8 +93,9 @@ class RoomRTC extends EventEmitter {
     const that = this
     that.addSocket(sws)
     const roomSocketEvent: RoomSocketEvent = {
-      eventName: 'message',
+      eventName: '_message',
       data: {
+        socketId: sws.socketId,
         message: `欢迎${sws.socketId}加入${that.roomAlias}`
       }
     }
@@ -186,6 +187,18 @@ class RoomRTC extends EventEmitter {
     this.swssSendSocketEvent(remoteSWSs, roomSocketEvent)
     this.socketMap.delete(sws.socketId)
     console.log(`current ${this.roomAlias} socketCount: `, this.getSocketCount())
+  }
+
+  public retransMessage(sws: SignalWebSocket, message: string) {
+    const remoteSWSs: SignalWebSocket[] = this.getAllSockets()
+    const roomSocketEvent: RoomSocketEvent = {
+      eventName: '_message',
+      data: {
+        socketId: sws.socketId, //发送者的socketId
+        message: message
+      }
+    }
+    this.swssSendSocketEvent(remoteSWSs, roomSocketEvent)
   }
 }
 

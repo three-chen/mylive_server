@@ -14,6 +14,7 @@ class SignalServer extends EventEmitter {
   }
 
   public init() {
+    this.on('__message', this.retransMessage)
     this.on('__joinRoom', this.joinRoom)
     this.on('__ice_candidate', this.iceCandidate)
     this.on('__offer', this.retransOffer)
@@ -99,6 +100,19 @@ class SignalServer extends EventEmitter {
     // 如果room为空，就删除该room
     if (room && room.getSocketCount() === 0) {
       that.roomMap.delete(sws.roomAlias)
+    }
+  }
+
+  /**
+   *
+   * @param sws 发送者
+   * @param message 代发送的信息
+   */
+  public retransMessage(sws: SignalWebSocket, message: string) {
+    const that = this
+    const room = that.roomMap.get(sws.roomAlias)
+    if (room) {
+      room.retransMessage(sws, message)
     }
   }
 }
