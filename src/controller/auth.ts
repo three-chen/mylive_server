@@ -3,27 +3,35 @@ import { Context } from 'koa'
 import AuthService from '@/service/auth'
 import UserService from '@/service/user'
 
-import LoginInfo from '@/service/data/LoginInfo'
-import UserInfo from '@/service/data/UserInfo'
+import type LoginInfo from '@/service/data/auth/LoginInfo'
+import type LoginR from '@/service/data/auth/LoginR'
+import type UserInfo from '@/service/data/UserInfo'
+import RegisterR from '@/service/data/auth/RegisterR'
 
 class AuthController {
   public async postLogin(ctx: Context) {
     const loginInfo: LoginInfo = ctx.request.body
 
+
     const user = await UserService.getUserByEmailWhenLogin(loginInfo.email)
     if (!user) {
-      ctx.code = 401
+      ctx.status = 401
       ctx.body = 'User not found'
     } else {
       const equal = await AuthService.verifyPassword(loginInfo.password, user.password)
       if (equal) {
         const token = AuthService.jwtSign(user.id)
 
-        ctx.code = 200
-        ctx.body = { token: token }
+        const loginR: LoginR = {
+          username: user.name,
+          useremail: user.email,
+          token: token,
+        }
+        ctx.body = loginR
+        ctx.status = 200
       } else {
-        ctx.code = 401
         ctx.body = 'Password is wrong'
+        ctx.status = 401
       }
     }
   }
@@ -35,15 +43,19 @@ class AuthController {
     if (!user) {
       const newUser = await UserService.createUser(userInfo)
       if (newUser) {
-        ctx.code = 200
-        ctx.body = newUser
+        const registerR: RegisterR = {
+          username: newUser.name,
+          useremail: newUser.email,
+        }
+        ctx.body = registerR
+        ctx.status = 200
       } else {
-        ctx.code = 500
         ctx.body = 'Server error'
+        ctx.status = 500
       }
     } else {
-      ctx.code = 409
       ctx.body = 'User already exists'
+      ctx.status = 409
     }
   }
 }

@@ -1,4 +1,4 @@
-// 一定要将import './init';放到最开头,因为它里面初始化了路径别名
+// 一定要将import './init/alias' 放到最开头,因为它里面初始化了路径别名
 import './init/alias'
 
 import { AppDataSource } from '@/data-source'

@@ -2,7 +2,7 @@ import Router from '@koa/router'
 
 import AuthController from '@/controller/auth'
 
-const authRouter = new Router({ prefix: '/auth' })
+const authRouter = new Router({ prefix: '/api/auth' })
 
 // auth 相关的路由
 authRouter.post('/login', AuthController.postLogin)
