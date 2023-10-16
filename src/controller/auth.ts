@@ -5,18 +5,21 @@ import UserService from '@/service/user'
 
 import type LoginInfo from '@/service/data/auth/LoginInfo'
 import type LoginR from '@/service/data/auth/LoginR'
+
 import type UserInfo from '@/service/data/UserInfo'
 import RegisterR from '@/service/data/auth/RegisterR'
+
+import R from '@/service/data/R'
 
 class AuthController {
   public async postLogin(ctx: Context) {
     const loginInfo: LoginInfo = ctx.request.body
 
-
     const user = await UserService.getUserByEmailWhenLogin(loginInfo.email)
     if (!user) {
+      const r = new R(false, null, 'User not found')
+      ctx.body = r
       ctx.status = 401
-      ctx.body = 'User not found'
     } else {
       const equal = await AuthService.verifyPassword(loginInfo.password, user.password)
       if (equal) {
@@ -25,12 +28,14 @@ class AuthController {
         const loginR: LoginR = {
           username: user.name,
           useremail: user.email,
-          token: token,
+          token: token
         }
-        ctx.body = loginR
+        const r = new R(true, loginR, null)
+        ctx.body = r
         ctx.status = 200
       } else {
-        ctx.body = 'Password is wrong'
+        const r = new R(false, null, 'Password is wrong')
+        ctx.body = r
         ctx.status = 401
       }
     }
@@ -45,16 +50,20 @@ class AuthController {
       if (newUser) {
         const registerR: RegisterR = {
           username: newUser.name,
-          useremail: newUser.email,
+          useremail: newUser.email
         }
-        ctx.body = registerR
+
+        const r = new R(true, registerR, null)
+        ctx.body = r
         ctx.status = 200
       } else {
-        ctx.body = 'Server error'
+        const r = new R(false, null, 'Server error')
+        ctx.body = r
         ctx.status = 500
       }
     } else {
-      ctx.body = 'User already exists'
+      const r = new R(false, null, 'User already exists')
+      ctx.body = r
       ctx.status = 409
     }
   }
