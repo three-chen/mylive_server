@@ -48,6 +48,7 @@ export default class UserMapper {
     user.name = userInfo.name
     user.email = userInfo.email
     user.password = userInfo.password
+    user.role = 'normal'
 
     return await UserMapper.userRepository.save(user)
   }

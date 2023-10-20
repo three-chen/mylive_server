@@ -209,6 +209,7 @@ class RoomRTC extends EventEmitter {
         message: "pong"
       }
     }
+
     this.swsSendSocketEvent(sws, roomSocketEvent)
   }
 }

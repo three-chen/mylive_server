@@ -16,6 +16,9 @@ export class User {
   @Column()
   email: string
 
+  @Column()
+  role: string
+
   @BeforeInsert()
   async hashPasswordBeforeInsert() {
     this.password = await argon2.hash(this.password)

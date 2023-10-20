@@ -26,10 +26,10 @@ class SignalServer extends EventEmitter {
   public initSignalSocket(ws: WebSocket) {
     const sws = new SignalWebSocket(ws)
     const that = this
-    sws.webSocket.onmessage = (message: MessageEvent<any>) => {
+    sws.webSocket.addEventListener("message", (message: MessageEvent<any>) => {
       const roomSocketEvent: RoomSocketEvent = JSON.parse(message.data)
       that.emit(roomSocketEvent.eventName, sws, ...getObjectValues(roomSocketEvent.data))
-    }
+    })
     sws.webSocket.onclose = () => {
       console.log('socket closed')
     }
@@ -125,9 +125,11 @@ class SignalServer extends EventEmitter {
   public handleHeartBeat(sws: SignalWebSocket, ping: string) {
     const that = this
     const room = that.roomMap.get(sws.roomAlias)
+    console.log(ping);
     if (room) {
       room.sendHeartBeat(sws)
     }
+
   }
 }
 

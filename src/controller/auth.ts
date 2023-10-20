@@ -1,6 +1,6 @@
 import { Context } from 'koa'
 
-import AuthService from '@/service/auth'
+import AuthService from '@/service/auth/auth'
 import UserService from '@/service/user'
 
 import type LoginInfo from '@/service/data/auth/LoginInfo'
@@ -23,12 +23,14 @@ class AuthController {
     } else {
       const equal = await AuthService.verifyPassword(loginInfo.password, user.password)
       if (equal) {
-        const token = AuthService.jwtSign(user.id)
+        const token = AuthService.jwtSign(user)
 
+        const auth = AuthService.getUserPermission(user)
         const loginR: LoginR = {
           username: user.name,
           useremail: user.email,
-          token: token
+          token: token,
+          auth: auth
         }
         const r = new R(true, loginR, null)
         ctx.body = r
@@ -65,6 +67,22 @@ class AuthController {
       const r = new R(false, null, 'User already exists')
       ctx.body = r
       ctx.status = 409
+    }
+  }
+
+  public async getUserPermission(ctx: Context) {
+    const email: string = ctx.request.body
+
+    const user = await UserService.getUserByEmailWhenLogin(email)
+    if (!user) {
+      const r = new R(false, null, 'User not found')
+      ctx.body = r
+      ctx.status = 401
+    } else {
+      const auth = AuthService.getUserPermission(user)
+      const r = new R(true, auth, null)
+      ctx.body = r
+      ctx.status = 200
     }
   }
 }

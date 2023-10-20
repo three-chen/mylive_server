@@ -7,5 +7,6 @@ const authRouter = new Router({ prefix: '/api/auth' })
 // auth 相关的路由
 authRouter.post('/login', AuthController.postLogin)
 authRouter.post('/register', AuthController.postRegister)
+authRouter.post('/permission', AuthController.getUserPermission)
 
 export default authRouter
