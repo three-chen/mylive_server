@@ -186,6 +186,7 @@ class RoomRTC extends EventEmitter {
     }
     this.swssSendSocketEvent(remoteSWSs, roomSocketEvent)
     this.socketMap.delete(sws.socketId)
+    // sws.webSocket.close()
     console.log(`current ${this.roomAlias} socketCount: `, this.getSocketCount())
   }
 
@@ -199,6 +200,16 @@ class RoomRTC extends EventEmitter {
       }
     }
     this.swssSendSocketEvent(remoteSWSs, roomSocketEvent)
+  }
+
+  public sendHeartBeat(sws: SignalWebSocket) {
+    const roomSocketEvent: RoomSocketEvent = {
+      eventName: '_heart_beat',
+      data: {
+        message: "pong"
+      }
+    }
+    this.swsSendSocketEvent(sws, roomSocketEvent)
   }
 }
 

@@ -20,6 +20,7 @@ class SignalServer extends EventEmitter {
     this.on('__offer', this.retransOffer)
     this.on('__answer', this.retransAnswer)
     this.on('__remove_peer', this.removePeer)
+    this.on('__heart_beat', this.handleHeartBeat)
   }
 
   public initSignalSocket(ws: WebSocket) {
@@ -113,6 +114,19 @@ class SignalServer extends EventEmitter {
     const room = that.roomMap.get(sws.roomAlias)
     if (room) {
       room.retransMessage(sws, message)
+    }
+  }
+
+  /**
+   *
+   * @param sws 发送者
+   * @param ping 发送来的ping
+   */
+  public handleHeartBeat(sws: SignalWebSocket, ping: string) {
+    const that = this
+    const room = that.roomMap.get(sws.roomAlias)
+    if (room) {
+      room.sendHeartBeat(sws)
     }
   }
 }
